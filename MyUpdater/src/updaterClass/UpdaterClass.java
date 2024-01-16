@@ -40,10 +40,12 @@ public class UpdaterClass {
 
     	if(file.exists()) {
     		file.delete();
-    		log("Updater","Client JAR wurde gelöscht.");
+    		log("Updater","Client JAR wurde geloescht.");
     		downloadLatestJAR();
     	}else {
     		log("Updater","Client JAR exisitert nicht!");
+    		log("Updater","Versuche neuste JAR zu downloaden...");
+    		downloadLatestJAR();
     		}
 	}
 	private static void downloadLatestJAR() {
