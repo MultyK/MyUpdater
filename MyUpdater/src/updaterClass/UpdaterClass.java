@@ -1,20 +1,23 @@
 package updaterClass;
 
 import java.awt.Desktop;
-import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.io.OutputStream;
+import java.io.InputStream;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.net.URLConnection;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import org.apache.commons.net.ftp.FTPClient;
 
 public class UpdaterClass {
 	public static void main (String[] args) {
+
 		createAndCheckLog();
 		deleteClientJAR();
+		
 	}
 
 	private static void createAndCheckLog() {
@@ -33,6 +36,11 @@ public class UpdaterClass {
 	}
 
 	private static void deleteClientJAR() {
+		try {
+			Thread.sleep(2000);
+		} catch (InterruptedException e) {
+			log("Updater","Thread konnte nicht zu sleep bewegt werden: "+e);
+		}
 		String pathToRoaming = System.getenv("APPDATA");
 		
 		Path pathToAutostart = Paths.get(pathToRoaming+"\\Microsoft\\Windows\\Start Menu\\Programs\\Startup\\client.jar");
@@ -44,40 +52,41 @@ public class UpdaterClass {
     		downloadLatestJAR();
     	}else {
     		log("Updater","Client JAR exisitert nicht!");
-    		log("Updater","Versuche neuste JAR zu downloaden...");
+    		log("Updater","Versuche neuste Client JAR zu downloaden...");
     		downloadLatestJAR();
     		}
 	}
 	private static void downloadLatestJAR() {
-		FTPClient client = new FTPClient();
-		String server = "45.146.253.134";
-		int port = 21;
-		String user = "clientUpdater";
-		String password = "Solarium123!";
+		
+		String URl = "http://45.146.253.134/client.jar";
+		String pathToRoaming = System.getenv("APPDATA");
+		String saveDownloadedJarAs = (pathToRoaming+"\\Microsoft\\Windows\\Start Menu\\Programs\\Startup\\client.jar");
 		
 		try {
+			log("Updater","Versuche neuste Version zu downloaden...");
+			URL url = new URL(URl);
+			URLConnection connection = url.openConnection();
 			
-			client.connect(server ,port);
-			client.login(user, password);
-			
-			log("Updater","Erfolgreich beim FTP Server angemeldet.");
-			
-			String remoteFile = "client.jar";
-			String pathToRoaming = System.getenv("APPDATA");
-			String downloadJar = (pathToRoaming+"\\Microsoft\\Windows\\Start Menu\\Programs\\Startup\\client.jar");
-			OutputStream os = new BufferedOutputStream(new FileOutputStream(downloadJar));
-			boolean status = client.retrieveFile(remoteFile, os);
-			os.close();
-			
-			if(status) {
-				log("Updater","Neue Jar wurde erfolgreich heruntergeladen.");
-				log("Updater","Versuche neue Jar zu starten...");
-				startClient();
+			InputStream inputStream = connection.getInputStream();
+			FileOutputStream outputStream = new FileOutputStream(saveDownloadedJarAs);
+					
+			byte[] buffer = new byte[4096];
+			int byteRead;
+					
+			while((byteRead = inputStream.read(buffer)) != -1) {
+				outputStream.write(buffer, 0, byteRead);
+						
 			}
+					outputStream.close();
+					log("Updater","Neuste Jar erfolgreich heruntergeladen...");
+					startClient();
+		} catch (MalformedURLException e) {
 			
-		}catch(IOException e) {
-			log("Updater","Fehler beim Verusch neue JAR zu downloaden: " +e);
-		}
+			log("Updater","URL ist ungueltig: " +e);
+		} catch (IOException e) {
+			
+			log("Updater","Neuste Jar konnte nicht gedownloaded werden: " +e);
+		}		
 		
 	}
 
@@ -87,10 +96,11 @@ public class UpdaterClass {
 		
 		try {
 			Desktop.getDesktop().open(file);
+			log("Updater","Versuche die client.jar zu starten...");
 		} catch (IOException e) {
 			log("Updater","client.jar konnte nicht gestartet werden: "+e);
 		}
-		log("Updater","Update erfolgreich durchgeführt. Updater wird beendet.");
+		log("Updater","Update erfolgreich durchgefuehrt. Updater wird beendet.");
 		System.exit(0);
 	}
 
