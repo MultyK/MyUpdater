@@ -83,6 +83,7 @@ public class UpdaterClass {
 		} catch (MalformedURLException e) {
 			
 			log("Updater","URL ist ungueltig: " +e);
+			//TODO in jedem Catch muss die CLient Jar wieder gestartet werden. Ansonsten bleibt das System ungeschuetzt.
 		} catch (IOException e) {
 			
 			log("Updater","Neuste Jar konnte nicht gedownloaded werden: " +e);
@@ -95,8 +96,8 @@ public class UpdaterClass {
 		File file = new File(pathToRoaming+"\\Microsoft\\Windows\\Start Menu\\Programs\\Startup\\client.jar");
 		
 		try {
-			Desktop.getDesktop().open(file);
 			log("Updater","Versuche die client.jar zu starten...");
+			Desktop.getDesktop().open(file);
 		} catch (IOException e) {
 			log("Updater","client.jar konnte nicht gestartet werden: "+e);
 		}
