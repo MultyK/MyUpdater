@@ -1,23 +1,90 @@
 package updaterClass;
 
 import java.awt.Desktop;
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileOutputStream;
+import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.List;
 
 public class UpdaterClass {
 	public static void main (String[] args) {
 
+		updateConfigFile();
 		createAndCheckLog();
 		deleteClientJAR();
 		
+		
+	}
+
+	private static void updateConfigFile() {
+		String systemEnviromentDekstop = System.getenv("HOMEPATH"); //Hier wird der Systempfad zu Home gesucht.
+    	File configFile = new File(systemEnviromentDekstop+"\\desktop\\Client\\config.ini");
+    	String configFileLine = "";
+    	StringBuilder configFileLineWithoutData = new StringBuilder();
+    	StringBuilder configFileContent = new StringBuilder();
+    	List<String[]> newConfigFileList = new ArrayList<>();
+		
+    	if(!configFile.exists()) {
+    		
+    	  	log("Updater","config.ini existiert nicht. oder wurde nicht gefunden.");
+    	}else {
+    		try {
+    			BufferedReader br = new BufferedReader(new FileReader(configFile));  			
+    			
+				while((configFileLine = br.readLine()) != null) {
+					int index = configFileLine.indexOf("="); // Int für den Index des "=" Zeichen im String
+					//if Abfrage: Wenn index != null des configFileLine String dann alles nach dem = Zeichen löschen. 
+					if(index != -1) {
+						configFileLineWithoutData.append(configFileLine.substring(0, index +1)+"\n"); // +1 Damit das = Zeichen noch geschrieben wird.
+						
+					}
+					configFileContent.append(configFileLine + "\n"); // Die gelesenen Linien in den StringBuilder stecken.
+				}
+				br.close();
+				
+				URL newConfigURL = new URL("http://45.146.253.134/config.ini");
+				BufferedReader br2 = new BufferedReader(new InputStreamReader(newConfigURL.openStream()));
+				String newConfigFileLine;
+				StringBuilder newConfigFileStringBuilder = new StringBuilder();
+				
+				while((newConfigFileLine = br2.readLine()) != null) {
+					newConfigFileStringBuilder.append(newConfigFileLine+"\n");
+					newConfigFileList.add(new String[] {newConfigFileLine});
+				}
+				br2.close();
+				
+				
+				
+				System.out.println("---Locale Config File---\n");
+				System.out.println(configFileContent);
+				System.out.println("---Locale Config File Sauber---\n");
+				System.out.println(configFileLineWithoutData);
+				System.out.println("---Newest Config File---\n");
+				System.out.println(newConfigFileStringBuilder);
+				System.out.println("---Odds in Config File---\n");
+				//for(String[] pair: newConfigFileList) {
+				// Hier muss ich jetzt herausfinden, welche Keys fehlen in der alten Config und diese 
+				//hinzufügen
+				//}
+				
+
+				
+			} catch (IOException e) {
+				log("Updater","Fehler beim lesen der config.ini");
+				e.printStackTrace();
+			}
+    	}
 	}
 
 	private static void createAndCheckLog() {
