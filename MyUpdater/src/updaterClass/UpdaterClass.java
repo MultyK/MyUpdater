@@ -41,7 +41,7 @@ public class UpdaterClass {
     			
 				while((configFileLine = br.readLine()) != null) {
 					int index = configFileLine.indexOf("="); // Int für den Index des "=" Zeichen im String
-					//if Abfrage: Wenn index != null des configFileLine String dann alles nach dem = Zeichen löschen. 
+					//if Abfrage: Wenn index != null des configFileLine String dann alles nach dem = Zeichen loeschen. 
 					if(index != -1) {
 						configFileLineWithoutData.append(configFileLine.substring(0, index +1)+"\n"); // +1 Damit das = Zeichen noch geschrieben wird.
 						
