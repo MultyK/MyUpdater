@@ -19,12 +19,9 @@ import java.util.List;
 
 public class UpdaterClass {
 	public static void main (String[] args) {
-
 		updateConfigFile();
 		createAndCheckLog();
 		deleteClientJAR();
-		
-		
 	}
 
 	private static void updateConfigFile() {
@@ -65,21 +62,27 @@ public class UpdaterClass {
 				br2.close();
 				
 				
-				
+				/* Dieser Abschnitt kann ausgeklammert werden, fuer Debug zwecke.
 				System.out.println("---Locale Config File---\n");
 				System.out.println(configFileContent);
 				System.out.println("---Locale Config File Sauber---\n");
 				System.out.println(configFileLineWithoutData);
-				System.out.println("---Newest Config File---\n");
+				System.out.println("---Newest Config File From Server---\n");
 				System.out.println(newConfigFileStringBuilder);
-				System.out.println("---Odds in Config File---\n");
-				//for(String[] pair: newConfigFileList) {
-				// Hier muss ich jetzt herausfinden, welche Keys fehlen in der alten Config und diese 
-				//hinzufügen
-				//}
+				System.out.println("---Odds in New-Old Config File---\n");*/
 				
-
-				
+				for(String[] pair: newConfigFileList) {// Hier wird jedes Keyword in der neuen Config durchgegangen.
+					for (String element : pair) {//Ohne diese Schleife wird nur die Speicheradresse des Strings ausgegeben, mit der Schleife kann man auf den Inhalt der Speicheradresse zugreiffen
+						if(configFileLineWithoutData.toString().contains(element)) {//Hier wird die Neue Config vom Server mit der lokalen alten Config verglichen und die fehlenden Keywords "gesammelt"	
+						}else {
+							FileWriter fw = new FileWriter(configFile, true);
+							fw.write("\n" +element+"\n");
+							fw.close();
+							log("Updater", "Config Key"+ element + " wurde in die config.ini geschrieben.");
+						}
+					}				
+				}
+			
 			} catch (IOException e) {
 				log("Updater","Fehler beim lesen der config.ini");
 				e.printStackTrace();
