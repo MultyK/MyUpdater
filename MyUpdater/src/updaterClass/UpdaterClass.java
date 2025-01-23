@@ -23,9 +23,10 @@ public class UpdaterClass {
 	
 	private static String downloadSource = "http://45.146.253.134/";
 	private static String pathToClientFolder = System.getenv("HOMEPATH") + "\\Desktop\\Client\\";
+	private static final double versionNumber = 1.1;
 	
 	public static void main (String[] args) {
-		log("Updater", "--- Starte Updater ---");
+		log("Updater", "--- Starte Updater V"+versionNumber +" ---");
 		updateConfigFile();
 		createAndCheckLog();
 		downloadNewFiles();
