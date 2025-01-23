@@ -18,10 +18,35 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class UpdaterClass {
+	//Dateien in diesem String werden heruntergeladen.
+	private static String[] filesToDownload = {"trayIcon.png"};
+	
+	private static String downloadSource = "http://45.146.253.134/";
+	private static String pathToClientFolder = System.getenv("HOMEPATH") + "\\Desktop\\Client\\";
+	
 	public static void main (String[] args) {
+		log("Updater", "--- Starte Updater ---");
 		updateConfigFile();
 		createAndCheckLog();
+		downloadNewFiles();
 		deleteClientJAR();
+	}
+	
+	private static void downloadNewFiles() {
+		log("Updater", "starte mit dem Download neuer Dateien...");
+		for(String fileToDownload : filesToDownload) {
+			try {
+				Boolean doesFileExists = DownloadManager.download(downloadSource + fileToDownload, pathToClientFolder + fileToDownload);
+				if(doesFileExists) {
+					log("Updater", fileToDownload + " wurde heruntergeladen.");
+				}else {
+					log("Updater", fileToDownload + " konnte nicht heruntergeladen werden.");
+				}
+			} catch (IOException e) {
+				log("Updater", "Konnte " +fileToDownload + " nicht herunterladen werden: " +e);
+			}
+		}
+		log("Updater", "Download neuer Dateien abgeschlossen.");
 	}
 
 	private static void updateConfigFile() {
@@ -172,10 +197,11 @@ public class UpdaterClass {
 			log("Updater","client.jar konnte nicht gestartet werden: "+e);
 		}
 		log("Updater","Update erfolgreich durchgefuehrt. Updater wird beendet.");
+		log("Updater", "--- Beende Updater ---");
 		System.exit(0);
 	}
 
-	private static void log(String Source, String Message) {
+	public static void log(String Source, String Message) {
         try {
         	String systemEnviromentDekstop = System.getenv("HOMEPATH");	//Hier wird der Systempfad zum Dekstop gesucht.
             FileWriter fw = new FileWriter(systemEnviromentDekstop+"\\desktop\\Client\\updaterLog.log", true); //Hier wird der FileWriter initialisiert f�r den gefunden Pfad zu systemEnviromentDekstop.
